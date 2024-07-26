@@ -7,10 +7,27 @@ require('dotenv').config();
 const app = express();
 app.use(express.json());
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
-});
 
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL
+  });
+  
+// Test the connection
+pool.connect((err, client, release) => {
+    if (err) {
+      return console.error('Error acquiring client', err.stack);
+    }
+    console.log('Connected to PostgreSQL!');
+    client.query('SELECT NOW()', (err, result) => {
+      release();
+      if (err) {
+        return console.error('Error executing query', err.stack);
+      }
+      console.log(result.rows);
+    });
+  });
+
+  
 const PORT = process.env.PORT || 3000;
 
 // User registration
